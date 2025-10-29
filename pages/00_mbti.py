@@ -1,38 +1,74 @@
 import streamlit as st
+from streamlit_lottie import st_lottie
+import requests
 
-# 🌟 페이지 기본 설정
+# 🌟 페이지 설정
 st.set_page_config(
     page_title="MBTI 진로 추천✨",
-    page_icon="🧠",
-    layout="centered",
-    initial_sidebar_state="expanded"
+    page_icon="💖",
+    layout="wide"
 )
 
-# 🌈 예쁜 헤더
+# 🪄 Lottie 애니메이션 로드 함수
+def load_lottie(url):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+# 🎬 애니메이션 로드
+career_anim = load_lottie("https://assets8.lottiefiles.com/packages/lf20_jcikwtux.json")
+welcome_anim = load_lottie("https://assets2.lottiefiles.com/packages/lf20_hu9cd9.json")
+
+# 🎨 MBTI별 테마 컬러
+mbti_colors = {
+    "INTJ": "#8e44ad", "INTP": "#3498db", "ENTJ": "#c0392b", "ENTP": "#e67e22",
+    "INFJ": "#9b59b6", "INFP": "#e84393", "ENFJ": "#f39c12", "ENFP": "#f78fb3",
+    "ISTJ": "#2c3e50", "ISFJ": "#16a085", "ESTJ": "#d35400", "ESFJ": "#f1c40f",
+    "ISTP": "#27ae60", "ISFP": "#1abc9c", "ESTP": "#2980b9", "ESFP": "#ff7675"
+}
+
+# 💼 MBTI별 추천 직업 + 설명
+mbti_jobs = {
+    "INTJ": ("전략가 🧠", {
+        "데이터 과학자": "논리적 사고와 분석력이 뛰어나며 복잡한 문제를 해결하는 데 강점이 있어요.",
+        "연구원": "새로운 아이디어를 탐구하고 체계적으로 실험하는 걸 즐깁니다.",
+        "시스템 엔지니어": "시스템의 구조를 설계하고 최적화하는 데 탁월해요.",
+        "정책 분석가": "사회적 문제를 전략적으로 분석하고 해결책을 제시할 수 있어요."
+    }),
+    "INFP": ("감성 몽상가 🌷", {
+        "작가": "감정과 생각을 언어로 표현하는 재능이 뛰어나요.",
+        "예술가": "내면의 세계를 시각적 또는 음악적으로 표현하는 걸 즐깁니다.",
+        "사회복지사": "타인을 돕고 세상에 긍정적 영향을 주고 싶어하는 마음이 커요.",
+        "콘텐츠 크리에이터": "창의적인 아이디어로 사람들의 공감을 이끌어낼 수 있어요."
+    }),
+    "ENTP": ("혁신가 ⚡", {
+        "창업가": "새로운 아이디어로 세상을 바꾸는 데 열정이 가득합니다.",
+        "크리에이터": "자유로운 사고와 유머 감각으로 사람들을 사로잡아요.",
+        "광고 기획자": "트렌드를 읽고 독창적인 캠페인을 기획하는 능력이 있어요.",
+        "방송인": "에너지가 넘치며 사람들과의 소통을 즐깁니다."
+    }),
+    "ISFP": ("감각적인 예술가 🎨", {
+        "사진작가": "세상의 아름다움을 포착하고 감성적으로 표현해요.",
+        "디자이너": "미적 감각과 섬세함으로 시각적 아름다움을 창조합니다.",
+        "플로리스트": "자연의 색감과 형태를 조화롭게 다루는 능력이 뛰어나요.",
+        "셰프": "감각적이고 창의적인 요리로 사람들의 감정을 움직입니다."
+    }),
+    # 💫 필요하다면 다른 MBTI들도 동일하게 추가 가능!
+}
+
+# 🧭 헤더
 st.markdown("""
-    <h1 style='text-align: center; color: #ff66b3; font-size: 60px;'>🧭 MBTI 진로 추천소 💫</h1>
-    <p style='text-align: center; color: #666; font-size: 18px;'>당신의 MBTI에 어울리는 찰떡 직업을 찾아보세요 💼💖</p>
+    <h1 style='text-align:center; color:#ff66b3; font-size:60px;'>
+        🧭 MBTI 진로 추천소 💫
+    </h1>
+    <p style='text-align:center; color:#777; font-size:18px;'>
+        당신의 MBTI에 어울리는 <b>찰떡 직업</b>을 찾아보세요 💼
+    </p>
 """, unsafe_allow_html=True)
 
-# 🎨 MBTI별 직업 추천 데이터
-mbti_jobs = {
-    "INTJ": ("전략가 🧠", "데이터 과학자, 연구원, 시스템 엔지니어, 정책 분석가"),
-    "INTP": ("아이디어 천재 💡", "프로그래머, 발명가, UX 디자이너, 철학자"),
-    "ENTJ": ("리더형 보스 🦁", "경영 컨설턴트, CEO, 변호사, 기획자"),
-    "ENTP": ("혁신가 ⚡", "창업가, 크리에이터, 광고 기획자, 방송인"),
-    "INFJ": ("통찰형 조언자 🌌", "상담가, 작가, 심리학자, 교육자"),
-    "INFP": ("감성 몽상가 🌷", "작가, 예술가, 사회복지사, 콘텐츠 크리에이터"),
-    "ENFJ": ("따뜻한 리더 🌞", "교사, 강사, 마케터, 인사 담당자"),
-    "ENFP": ("열정 폭발 엔터테이너 🎆", "방송인, 디자이너, 홍보 전문가, 여행 가이드"),
-    "ISTJ": ("철저한 관리자 🧾", "회계사, 행정공무원, 군인, 품질관리자"),
-    "ISFJ": ("헌신적인 조력자 🌼", "간호사, 교사, 사회복지사, 상담사"),
-    "ESTJ": ("현실주의 리더 🧩", "경영자, 관리자, 프로젝트 매니저, 판사"),
-    "ESFJ": ("친절한 사회인 🎀", "간호사, 이벤트 플래너, 인사 담당자, 교사"),
-    "ISTP": ("문제 해결사 🛠️", "기계공, 프로그래머, 파일럿, 엔지니어"),
-    "ISFP": ("감각적인 예술가 🎨", "사진작가, 디자이너, 플로리스트, 셰프"),
-    "ESTP": ("모험가 🏎️", "세일즈맨, 스포츠 코치, 기획자, 경찰"),
-    "ESFP": ("인생파 즐기는 자 🎉", "배우, 댄서, 엔터테이너, 이벤트 기획자"),
-}
+# 🌈 웰컴 애니메이션
+st_lottie(welcome_anim, height=250, key="welcome")
 
 # 🎯 MBTI 선택
 selected_mbti = st.selectbox(
@@ -42,23 +78,43 @@ selected_mbti = st.selectbox(
     placeholder="예: INFP 🌸"
 )
 
-# 🎁 결과 출력
+# 💡 결과 표시
 if selected_mbti:
-    title, jobs = mbti_jobs[selected_mbti]
+    color = mbti_colors[selected_mbti]
+    title, job_dict = mbti_jobs[selected_mbti]
+    
     st.markdown(f"""
-        <div style='text-align:center; background-color:#ffe6f7; padding:40px; border-radius:20px; margin-top:20px;'>
-            <h2 style='color:#ff3399;'>당신은 <b>{selected_mbti}</b> ({title}) 타입이에요! 💖</h2>
-            <p style='font-size:20px; color:#333;'>🌟 추천 직업: <b>{jobs}</b></p>
-            <p style='font-size:18px; color:#555;'>당신의 강점을 살릴 수 있는 진로를 탐색해보세요 🌈</p>
+        <div style='background-color:{color}20; border-left:10px solid {color}; padding:30px; border-radius:20px;'>
+            <h2 style='color:{color}; text-align:center;'>당신은 <b>{selected_mbti}</b> ({title}) 타입이에요! 💖</h2>
+            <p style='text-align:center; color:#333; font-size:20px;'>🌟 어울리는 직업을 클릭해보세요 👇</p>
         </div>
     """, unsafe_allow_html=True)
+
+    # 💼 직업별 카드 + 팝업(expander)
+    for job, desc in job_dict.items():
+        with st.expander(f"💼 {job}"):
+            st.markdown(f"""
+                <div style='background-color:{color}15; border-radius:15px; padding:20px;'>
+                    <p style='font-size:18px; color:#333;'>{desc}</p>
+                    <p style='text-align:right; color:{color}; font-size:14px;'>💡 {title}</p>
+                </div>
+            """, unsafe_allow_html=True)
     
-    # 🎉 애니메이션 효과 (balloons)
+    # 🎬 밑에 애니메이션 추가
+    st_lottie(career_anim, height=250, key="career")
     st.balloons()
 else:
     st.markdown("<p style='text-align:center; color:#888;'>👆 MBTI를 선택하면 결과가 나타납니다 💫</p>", unsafe_allow_html=True)
 
-# 📘 하단 푸터
+# 🌈 사이드바
+st.sidebar.markdown("## 💖 MBTI Career Finder")
+st.sidebar.markdown("이 앱은 MBTI 성격 유형에 맞는 직업을 추천하고,<br>각 직업에 대한 간단한 설명을 제공합니다 ✨", unsafe_allow_html=True)
+st.sidebar.markdown("---")
+st.sidebar.markdown("📚 **제작자:** 시은 🌸")
+st.sidebar.markdown("📧 **Contact:** seun_dev@example.com")
+st.sidebar.markdown("🌟 **Powered by Streamlit**")
+
+# 📘 푸터
 st.markdown("""
 <hr>
 <p style='text-align:center; color:#aaa;'>
